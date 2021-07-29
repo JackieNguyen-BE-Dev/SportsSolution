@@ -24,7 +24,7 @@ namespace SportsStore.Tests {
 
             // Act
             ProductsListViewModel result =
-                controller.Index().ViewData.Model as ProductsListViewModel;
+                controller.Index(null).ViewData.Model as ProductsListViewModel;
 
             // Assert
             Product[] prodArray = result.Products.ToArray();
@@ -37,27 +37,27 @@ namespace SportsStore.Tests {
         public void Can_Paginate() {
             // Arrange
             Mock<IStoreRepository> mock = new Mock<IStoreRepository>();
-            mock.Setup(m => m.Products).Returns((new Product[] {
-                new Product {ProductID = 1, Name = "P1"},
-                new Product {ProductID = 2, Name = "P2"},
-                new Product {ProductID = 3, Name = "P3"},
-                new Product {ProductID = 4, Name = "P4"},
-                new Product {ProductID = 5, Name = "P5"}
+            mock.Setup(foo => foo.Products).Returns((new Product[] {
+                new Product {ProductID = 1, Name = "P1", Category ="Cat1"},
+                new Product {ProductID = 2, Name = "P2", Category ="Cat2"},
+                new Product {ProductID = 3, Name = "P3", Category ="Cat3"},
+                new Product {ProductID = 4, Name = "P4", Category ="Cat1"},
+                new Product {ProductID = 5, Name = "P5", Category ="Cat2"}
             }).AsQueryable<Product>());
 
             HomeController controller = new HomeController(mock.Object);
             controller.PageSize = 3;
 
             // Act
-            ProductsListViewModel result =
-               controller.Index(2).ViewData.Model as ProductsListViewModel;
+            ProductsListViewModel result = 
+                controller.Index("Cat2",1).ViewData.Model as ProductsListViewModel;
 
             // Assert
-            Product[] prodArray = result.Products.ToArray();
+            Product[] products = result.Products.ToArray();
 
-            Assert.True(prodArray.Length == 2);
-            Assert.Equal("P4", prodArray[0].Name);
-            Assert.Equal("P5", prodArray[1].Name);
+            Assert.True(products.Length == 2);
+            Assert.Equal("P2", products[0].Name);
+            Assert.Equal("P5", products[1].Name);
         }
 
         [Fact]
@@ -79,10 +79,11 @@ namespace SportsStore.Tests {
 
             // Act
             ProductsListViewModel result =
-                controller.Index(2).ViewData.Model as ProductsListViewModel;
+                controller.Index(null,2).ViewData.Model as ProductsListViewModel;
 
             // Assert
             PagingInfo pageInfo = result.PagingInfo;
+
             Assert.Equal(2, pageInfo.CurrentPage);
             Assert.Equal(3, pageInfo.ItemsPerPage);
             Assert.Equal(5, pageInfo.TotalItems);

@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using SportsStore.Models;
+using Microsoft.AspNetCore.Routing.Constraints;
 
 namespace SportsStore {
     public class Startup {
@@ -38,9 +39,21 @@ namespace SportsStore {
 
             app.UseRouting();
             app.UseEndpoints(endpoints => {
+                endpoints.MapControllerRoute("catpage",
+                    "{category}/Page{productPage}",
+                    new { Controller = "Home", action = "Index"},
+                    new { productPage = new IntRouteConstraint() });
+                endpoints.MapControllerRoute("page",
+                    "Page{productPage}",
+                    new { Controller = "Home", action = "Index", productPage = 1 },
+                    new { productPage = new IntRouteConstraint() });
+                endpoints.MapControllerRoute("category",
+                    "{category}",
+                    new { Controller = "Home", action = "Index", productPage = 1 },
+                    new { productPage = new IntRouteConstraint() });
                 endpoints.MapControllerRoute("pagination",
                     "Products/Page{productPage}",
-                    new { Controller = "Home", action = "Index" });
+                    new { Controller = "Home", action = "Index", productPage = 1 });
                 endpoints.MapDefaultControllerRoute();
             });
 
