@@ -39,8 +39,12 @@ namespace SportsStore.Controllers {
                 {
                     CurrentPage = productPage,
                     ItemsPerPage = PageSize,
-                    TotalItems = repository.Products.Count()
-                }
+                    TotalItems = string.IsNullOrEmpty(category) ?
+                                        repository.Products.Count() :
+                                        repository.Products.Where(p => p.Category == category)
+                                        .Count(),
+                },
+                CurrentCategory = category
             };
             return View(result);
         }
